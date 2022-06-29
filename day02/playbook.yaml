@@ -1,0 +1,28 @@
+- name: Basic server test
+  hosts: all
+  tasks:
+  - name: Check connectivity
+    ping:
+  - name: Print server IP address
+    debug:
+      msg: "The Current IP address is {{ ansible_host }}"
+  # - name: Install Nginx
+  #   apt:
+  #     update_cache: yes
+  #     name: "{{ item.name }}"
+  #     state: "{{ item.version }}"
+  #   loop: "{{ to_install }}"
+  # - name: Enable Nginx
+  #   systemd:
+  #     name: nginx
+  #     state: started
+  #     enabled: yes
+  - name: list all files in /etc
+    find:
+      paths: /etc
+      recurse: yes
+    register: etc_files
+  - name: list output
+    debug:
+      msg: "{{ item.path }} : {{ item.mode }} "
+    loop: "{{ etc_files.files }}"

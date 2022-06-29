@@ -1,0 +1,57 @@
+- name: Installing code-server
+  hosts: server-0
+  tasks:
+  - name: Create directory
+    file:
+      path: /code-server
+      state: directory
+  - name: Download source code
+    get_url:
+      url: https://github.com/cdr/code-server/releases/download/v3.3.1/code-server-3.3.1-linux-amd64.tar.gz
+      dest: /code-server
+      mode: '0600'
+  - name: Unzip file
+    unarchive:
+      remote_src: yes
+      src: /code-server/code-server-3.3.1-linux-amd64.tar.gz
+      dest: /usr/lib
+  - name: Rename the folder to /usr/lib/code-server
+    shell:
+      cmd: rm -rf code-server && mv code-server-3.3.1-linux-amd64 code-server
+      chdir: /usr/lib 
+  - name: Link the binary
+    file:
+      src: /usr/lib/code-server/bin/code-server
+      dest: /usr/bin/code-server
+      state: link
+  - name: Create user data directory
+    file:
+      path: /var/lib/code-server
+      state: directory
+  - name: Create the code-server service
+    copy:
+      dest: /lib/systemd/system/code-server.service
+      src: ./code-server.service
+  - name: Start code-server
+    systemd:
+      name: code-server
+      state: started
+      enabled: yes
+  - name: Install Nginx
+    apt:
+      name: nginx
+      state: latest
+      update_cache: yes
+  - name: Nginx conf for code-server
+    copy:
+      dest: /etc/nginx/sites-available/code-server.conf
+      src: ./code-server.conf
+  - name: Link the binary
+    file:
+      src: /etc/nginx/sites-available/code-server.conf
+      dest: /etc/nginx/sites-enabled/code-server.conf
+      state: link
+  - name: Reload Nginx
+    systemd:
+      name: nginx
+      state: restarted
