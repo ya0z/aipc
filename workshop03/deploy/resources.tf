@@ -21,7 +21,7 @@ resource digitalocean_droplet code-server {
     provisioner "remote-exec" {
         inline = [
             "sed -i -e 's/__SET_THIS__/${var.cs_password}/' /lib/systemd/system/code-server.service",
-            "sed -i -e 's/__SET_THIS__/${var.code_server}-${self.ipv4_address}.nip.io/' /etc/nginx/sites-available/code-server.conf",
+            "sed -i -e 's/__SET_THIS__/${var.code_server}-${digitalocean_droplet.code-server.ipv4_address}.nip.io/' /etc/nginx/sites-available/code-server.conf",
             "systemctl daemon-reload",
             "systemctl restart code-server",
             "systemctl restart nginx"
@@ -29,10 +29,10 @@ resource digitalocean_droplet code-server {
     }
 }
 output domain_name {
-    #value = "${var.code_server}-${digitalocean_droplet.code-server.ipv4_address}.nip.io"
-    value = "${var.code_server}-${self.ipv4_address}.nip.io"
+    value = "${var.code_server}-${digitalocean_droplet.code-server.ipv4_address}.nip.io"
 }
-resource local_file inventory_yaml {
+
+/* resource local_file inventory_yaml {
   content = templatefile("inventory.yaml.tpl", {
     ssh_private_key = var.DO_private_key
     codeserver = var.code_server
@@ -42,4 +42,4 @@ resource local_file inventory_yaml {
   })
   filename = "inventory.yaml"
   file_permission = "0644"
-}
+} */
