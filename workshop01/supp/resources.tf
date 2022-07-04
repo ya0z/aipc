@@ -1,5 +1,5 @@
-data digitalocean_ssh_key chuk {
-    name = "chuk"
+data digitalocean_ssh_key my-key {
+    name = "macbook"
 }
 
 data docker_image dov-bear {
